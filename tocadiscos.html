@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tocadiscos 🎵</title>
+<!-- Preconnect para fuentes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fuentes con display=swap para evitar bloqueo -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="iconos/tocadiscos.png">
+<style>
+/* ─── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --wood-light:  #c8934a;
+  --wood-mid:    #a0722a;
+  --wood-dark:   #7a5218;
+  --vinyl-black: #1a1a1a;
+  --cream:       #f5ede0;
+  --pink:        #e8507a;
+  --pink-light:  #f7a8c4;
+  --red-label:   #c0202e;
+  --gold:        #d4a843;
+  --bg-dark:     #1c1008;
+}
+
+body {
+  min-height:100vh;
+  background: radial-gradient(ellipse at 30% 20%, #3a1a08 0%, #1c1008 50%, #0e0804 100%);
+  display:flex; flex-direction:column;
+  align-items:center;
+  font-family:'Lato',sans-serif;
+  color:#f5ede0;
+  overflow-x:hidden;
+  padding:0 0 60px;
+}
+
+/* ─── Floating hearts ─────────────────────────────── */
+.hearts-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.heart-float{position:absolute;opacity:0.08;animation:floatUp linear infinite;color:var(--pink-light);}
+@keyframes floatUp{
+  0%  {transform:translateY(110vh) rotate(0deg);  opacity:0;}
+  10% {opacity:.08;} 90%{opacity:.08;}
+  100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse {0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+@keyframes spin  {from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* ─── Page Header ─────────────────────────────────── */
+.page-top{
+  position:relative;z-index:10;
+  width:100%; max-width:900px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 20px 0;
+  animation:fadeIn .7s ease;
+}
+.btn-back{
+  font-family:'Caveat',cursive;font-size:1.1rem;font-weight:700;
+  color:var(--cream);background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.25);border-radius:30px;
+  padding:8px 20px;cursor:pointer;backdrop-filter:blur(8px);
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+  transition:background .2s,transform .2s;
+}
+.btn-back:hover{background:rgba(255,255,255,.2);transform:translateX(-3px);}
+.page-title-wrap{text-align:center;flex:1;}
+.page-title{font-family:'Playfair Display',serif;font-style:italic;font-size:2rem;color:var(--cream);text-shadow:0 2px 12px rgba(0,0,0,.5);}
+.page-title span{color:var(--gold);}
+.page-sub{font-family:'Lato',sans-serif;font-weight:300;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:rgba(245,237,224,.5);margin-top:4px;}
+.spacer{width:100px;}
+
+/* ─── Main layout ─────────────────────────────────── */
+.main-wrap{
+  position:relative;z-index:10;
+  width:100%; max-width:900px;
+  padding:30px 20px 0;
+  display:flex; flex-direction:column; align-items:center; gap:36px;
+  animation:fadeIn .9s ease;
+}
+
+/* ─── TURNTABLE ────────────────────────────────────── */
+.turntable-section{
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px; width:100%;
+}
+
+/* Wooden plinth (top-down perspective) */
+.plinth{
+  position:relative;
+  width:360px; height:320px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.04) 0px, rgba(255,255,255,.04) 1px,
+      transparent 1px, transparent 18px),
+    linear-gradient(170deg, #c8934a 0%, #a0722a 40%, #7a5218 70%, #5a3a10 100%);
+  border-radius:18px;
+  box-shadow:
+    0 0 0 6px #5a3a10,
+    0 0 0 8px #3a2408,
+    0 30px 70px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:flex-start;
+  padding-left:30px;
+  flex-shrink:0;
+}
+
+/* Platter (the spinning disc platform) */
+.platter-wrap{
+  position:relative;
+  width:230px;height:230px;
+  flex-shrink:0;
+}
+.platter{
+  width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle, #2a2a2a 0%, #111 60%, #0a0a0a 100%);
+  box-shadow: 0 0 0 4px #3a3a3a, 0 8px 24px rgba(0,0,0,.8);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Rubber mat ring effect */
+.platter::after{
+  content:'';position:absolute;inset:8px;border-radius:50%;
+  background:radial-gradient(circle, #2a2a2a 0%, #222 100%);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.5);
+}
+
+/* Vinyl record (spins when playing) */
+.vinyl{
+  position:absolute;
+  width:210px;height:210px;
+  border-radius:50%;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+}
+.vinyl-disc{
+  width:100%;height:100%;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle,
+      #1a1a1a 0px, #111 2px, #222 2px, #1a1a1a 4px),
+    radial-gradient(circle, #0a0a0a 0%, #1a1a1a 100%);
+  box-shadow:0 4px 20px rgba(0,0,0,.8);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+/* Groove shimmer */
+.vinyl-disc::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(
+    rgba(255,255,255,.04) 0deg,
+    transparent 30deg,
+    rgba(255,255,255,.03) 60deg,
+    transparent 90deg,
+    rgba(255,255,255,.05) 130deg,
+    transparent 180deg,
+    rgba(255,255,255,.03) 220deg,
+    transparent 270deg,
+    rgba(255,255,255,.04) 310deg,
+    transparent 360deg
+  );
+}
+
+/* Label in center */
+.vinyl-label{
+  width:78px;height:78px;border-radius:50%;
+  position:relative;z-index:2;
+  overflow:hidden;
+  border:2px solid rgba(255,255,255,.12);
+  box-shadow:0 2px 10px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+  background:#000;
+  flex-shrink:0;
+}
+.vinyl-label img{
+  width:100%;height:100%;object-fit:cover;border-radius:50%;
+}
+/* Spindle hole */
+.vinyl-label::after{
+  content:'';position:absolute;
+  width:8px;height:8px;background:#1a1a1a;
+  border-radius:50%;border:1px solid #555;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:3;
+}
+
+/* Spin animation */
+.vinyl.spinning .vinyl-disc{
+  animation:spin 2s linear infinite;
+}
+.vinyl-disc{
+  transition:animation .3s;
+}
+
+/* Spindle center on platter */
+.spindle{
+  position:absolute;width:12px;height:12px;
+  background:radial-gradient(circle,#ddd,#888);
+  border-radius:50%;z-index:5;
+  box-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+
+/* ── Tonearm ── */
+.tonearm-wrap{
+  position:absolute;
+  right:16px; top:24px;
+  width:90px;height:190px;
+  z-index:10;
+  transform-origin: 72px 14px;
+  transition:transform .8s cubic-bezier(.4,0,.2,1);
+}
+.tonearm-wrap.at-rest{transform:rotate(-8deg);}
+.tonearm-wrap.playing {transform:rotate(32deg);}
+
+/* Pivot base */
+.tonearm-pivot{
+  position:absolute;top:0;right:0;
+  width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle,#ccc,#888,#555);
+  box-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+/* Arm shaft */
+.tonearm-arm{
+  position:absolute;top:14px;right:14px;
+  width:5px;height:155px;
+  background:linear-gradient(180deg,#bbb,#888,#999);
+  border-radius:3px;
+  transform-origin:top center;
+  transform:rotate(0deg);
+  box-shadow:1px 1px 4px rgba(0,0,0,.5);
+}
+/* Head shell */
+.tonearm-head{
+  position:absolute;bottom:0;left:-10px;
+  width:22px;height:18px;
+  background:linear-gradient(135deg,#999,#555);
+  border-radius:3px 3px 6px 6px;
+  box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+/* Stylus */
+.tonearm-stylus{
+  position:absolute;bottom:-7px;left:8px;
+  width:3px;height:9px;
+  background:linear-gradient(180deg,#888,#c0202e);
+  border-radius:0 0 2px 2px;
+}
+
+/* Speaker grill on plinth */
+.plinth-grill{
+  position:absolute;bottom:16px;left:18px;right:260px;
+  height:28px;
+  background:repeating-linear-gradient(90deg,
+    #1a0e04 0px,#1a0e04 3px,#2a1a08 3px,#2a1a08 6px);
+  border-radius:4px;
+  opacity:.7;
+}
+
+/* LED */
+.plinth-led{
+  position:absolute;bottom:22px;right:82px;
+  width:7px;height:7px;border-radius:50%;
+  background:#c0202e;
+  box-shadow:0 0 6px #c0202e, 0 0 12px rgba(192,32,46,.5);
+  opacity:0;transition:opacity .5s;
+}
+.plinth-led.on{opacity:1;animation:ledPulse 2s ease-in-out infinite;}
+@keyframes ledPulse{0%,100%{box-shadow:0 0 6px #c0202e, 0 0 12px rgba(192,32,46,.4);}50%{box-shadow:0 0 10px #ff4060, 0 0 20px rgba(255,64,96,.6);}}
+
+/* Volume knob */
+.plinth-knob{
+  position:absolute;bottom:10px;right:50px;
+  width:26px;height:26px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ddd,#aaa,#777);
+  box-shadow:0 2px 6px rgba(0,0,0,.7);
+}
+
+/* Now playing info */
+.now-playing{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:12px 20px;
+  width:360px;
+  backdrop-filter:blur(8px);
+  min-height:62px;
+}
+.np-cover{
+  width:38px;height:38px;border-radius:6px;overflow:hidden;
+  flex-shrink:0;background:#333;
+  border:1px solid rgba(255,255,255,.15);
+}
+.np-cover img{width:100%;height:100%;object-fit:cover;}
+.np-text{flex:1;overflow:hidden;}
+.np-title{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.np-artist{font-size:.75rem;font-weight:300;letter-spacing:1px;color:rgba(245,237,224,.5);margin-top:2px;text-transform:uppercase;}
+.np-idle{font-family:'Playfair Display',serif;font-style:italic;font-size:.9rem;color:rgba(245,237,224,.35);width:100%;text-align:center;}
+
+/* Equalizer bars */
+.np-eq{display:flex;gap:3px;align-items:flex-end;height:24px;flex-shrink:0;}
+.eq-bar{
+  width:4px;border-radius:2px;
+  background:var(--pink);opacity:0;
+  animation:eqAnim 0.8s ease-in-out infinite alternate;
+}
+.eq-bar:nth-child(1){height:8px; animation-delay:0s;}
+.eq-bar:nth-child(2){height:18px;animation-delay:.15s;}
+.eq-bar:nth-child(3){height:13px;animation-delay:.3s;}
+.eq-bar:nth-child(4){height:22px;animation-delay:.1s;}
+.eq-bar:nth-child(5){height:10px;animation-delay:.25s;}
+@keyframes eqAnim{from{transform:scaleY(.3);}to{transform:scaleY(1);}}
+.np-eq.active .eq-bar{opacity:1;}
+
+/* Audio controls */
+.audio-controls{
+  display:flex;align-items:center;gap:18px;
+  margin-top:2px;
+}
+.ctrl-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:none;
+  color:rgba(245,237,224,.7);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .15s,color .2s;
+  padding:0;
+}
+.ctrl-btn:hover{background:rgba(255,255,255,.15);color:#fff;transform:scale(1.1);}
+.ctrl-btn:active{transform:scale(.93);}
+.ctrl-btn svg{width:20px;height:20px;display:block;}
+
+.ctrl-btn.play-btn{
+  width:58px;height:58px;
+  background:var(--pink);
+  box-shadow:0 4px 20px rgba(232,80,122,.5);
+  color:#fff;
+}
+.ctrl-btn.play-btn svg{width:24px;height:24px;}
+.ctrl-btn.play-btn:hover{background:#f06090;transform:scale(1.08);box-shadow:0 6px 26px rgba(232,80,122,.6);}
+
+/* Progress bar */
+.progress-wrap{
+  width:360px;
+  display:flex;align-items:center;gap:10px;
+}
+.progress-track{
+  flex:1;height:4px;background:rgba(255,255,255,.15);
+  border-radius:2px;cursor:pointer;position:relative;
+}
+.progress-fill{
+  height:100%;background:var(--pink);border-radius:2px;
+  width:0%;transition:width .5s linear;
+}
+.progress-time{font-size:.72rem;color:rgba(245,237,224,.5);letter-spacing:1px;min-width:36px;text-align:right;}
+
+/* ─── RECORD LIBRARY ────────────────────────────────── */
+.library-section{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  padding:24px 24px 28px;
+  backdrop-filter:blur(6px);
+}
+.library-title{
+  font-family:'Caveat',cursive;font-size:1.6rem;font-weight:700;
+  color:var(--gold);letter-spacing:1px;margin-bottom:4px;
+  display:flex;align-items:center;gap:10px;
+}
+.library-sub{
+  font-family:'Lato',sans-serif;font-weight:300;font-size:.75rem;
+  letter-spacing:2px;text-transform:uppercase;
+  color:rgba(245,237,224,.4);margin-bottom:20px;
+}
+
+/* Shelf wood */
+.shelf{
+  position:relative;
+  display:flex;gap:16px;flex-wrap:wrap;
+  padding-bottom:20px;
+}
+.shelf::after{
+  content:'';position:absolute;
+  bottom:0;left:-4px;right:-4px;height:14px;
+  background:linear-gradient(180deg,#6b4010,#4a2a08);
+  border-radius:2px;
+  box-shadow:0 6px 14px rgba(0,0,0,.5);
+}
+
+/* Vinyl sleeve (album cover) */
+.record-sleeve{
+  position:relative;
+  width:120px;flex-shrink:0;
+  cursor:pointer;
+  transition:transform .25s, box-shadow .25s;
+}
+.record-sleeve:hover{transform:translateY(-8px) scale(1.04);}
+.record-sleeve.active{transform:translateY(-10px) scale(1.06);}
+
+.sleeve-cover{
+  width:120px;height:120px;
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.6);
+  position:relative;
+  background:#222;
+}
+.sleeve-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* Vinyl peeking out from right */
+.sleeve-vinyl-peek{
+  position:absolute;right:-12px;top:6px;
+  width:108px;height:108px;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle,#1a1a1a 0px,#111 2px,#222 2px,#1a1a1a 4px);
+  z-index:-1;
+  box-shadow:2px 0 8px rgba(0,0,0,.6);
+}
+
+/* Active indicator */
+.sleeve-playing-badge{
+  position:absolute;top:6px;left:6px;
+  background:var(--pink);color:#fff;
+  font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 7px;border-radius:20px;
+  opacity:0;transition:opacity .3s;
+  box-shadow:0 2px 8px rgba(232,80,122,.5);
+}
+.record-sleeve.active .sleeve-playing-badge{opacity:1;}
+
+.sleeve-info{
+  margin-top:8px;padding:0 2px;
+}
+.sleeve-name{
+  font-family:'Playfair Display',serif;font-size:.82rem;
+  color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.2;
+}
+.sleeve-artist{
+  font-size:.7rem;font-weight:300;color:rgba(245,237,224,.45);
+  letter-spacing:.5px;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ─── Responsive ─── */
+@media(max-width:600px){
+  .plinth{width:300px;height:260px;padding-left:18px;}
+  .platter-wrap{width:185px;height:185px;}
+  .vinyl{width:168px;height:168px;}
+  .vinyl-label{width:62px;height:62px;}
+  .tonearm-wrap{right:10px;top:22px;width:76px;height:150px;}
+  .now-playing,.progress-wrap{width:300px;}
+  .record-sleeve{width:100px;}
+  .sleeve-cover{width:100px;height:100px;}
+  .sleeve-vinyl-peek{width:90px;height:90px;}
+  .page-title{font-size:1.5rem;}
+  .spacer{width:60px;}
+}
+</style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<!-- Header -->
+<div class="page-top">
+  <a class="btn-back" href="index.html">← Volver</a>
+  <div class="page-title-wrap">
+    <h1 class="page-title">🎵 <span>Canciones que me</span> Recuerda a Usted</h1>
+    <p class="page-sub">Para Mi Morenita Hermosa, con todo mi amor</p>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- ═══════════ TURNTABLE ═══════════ -->
+  <div class="turntable-section">
+
+    <!-- Wooden plinth -->
+    <div class="plinth" id="plinth">
+
+      <!-- Platter + Vinyl -->
+      <div class="platter-wrap">
+        <div class="platter">
+          <!-- Vinyl record -->
+          <div class="vinyl" id="vinyl">
+            <div class="vinyl-disc">
+              <div class="vinyl-label" id="vinylLabel">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" id="vinylLabelImg" decoding="async">
+              </div>
+            </div>
+          </div>
+          <div class="spindle"></div>
+        </div>
+      </div>
+
+      <!-- Tonearm -->
+      <div class="tonearm-wrap at-rest" id="tonearm">
+        <div class="tonearm-pivot"></div>
+        <div class="tonearm-arm">
+          <div class="tonearm-head">
+            <div class="tonearm-stylus"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Speaker grill, LED, knob -->
+      <div class="plinth-grill"></div>
+      <div class="plinth-led" id="plinthLed"></div>
+      <div class="plinth-knob"></div>
+
+    </div><!-- end plinth -->
+
+    <!-- Now playing -->
+    <div class="now-playing" id="nowPlaying">
+      <p class="np-idle" id="npIdle">Seleccione un vinilo para comenzar ♪</p>
+      <div class="np-cover" id="npCover" style="display:none"><img id="npCoverImg" src="" alt="" decoding="async"></div>
+      <div class="np-text" id="npText" style="display:none">
+        <div class="np-title" id="npTitle"></div>
+        <div class="np-artist" id="npArtist"></div>
+      </div>
+      <div class="np-eq" id="npEq">
+        <div class="eq-bar"></div><div class="eq-bar"></div>
+        <div class="eq-bar"></div><div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+      </div>
+    </div>
+
+    <!-- Audio controls -->
+    <div class="audio-controls">
+      <!-- Previous -->
+      <button class="ctrl-btn" onclick="prevTrack()" title="Anterior">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+        </svg>
+      </button>
+
+      <!-- Play / Pause -->
+      <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">
+        <svg id="iconPlay" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg id="iconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+      </button>
+
+      <!-- Next -->
+      <button class="ctrl-btn" onclick="nextTrack()" title="Siguiente">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 18l8.5-6L6 6v12zm2-8.14 5.09 2.14L8 14.14V9.86zM16 6h2v12h-2z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <span class="progress-time" id="timeCurrent">0:00</span>
+      <div class="progress-track" id="progressTrack" onclick="seekAudio(event)">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-time" id="timeTotal">0:00</span>
+    </div>
+
+  </div><!-- end turntable-section -->
+
+  <!-- ═══════════ RECORD LIBRARY ═══════════ -->
+  <div class="library-section">
+    <div class="library-title">🎶 Su Colección</div>
+    <div class="library-sub">Toque un vinilo para reproducir</div>
+    <div class="shelf" id="shelf">
+      <!-- Records are generated by JS from the RECORDS array below -->
+    </div>
+  </div>
+
+</div><!-- end main-wrap -->
+
+<!-- Hidden audio element -->
+<audio id="audioPlayer" preload="none"></audio>
+
+<script>
+// ══════════════════════════════════════════════════
+//  👇 CONFIGURA TUS CANCIONES AQUÍ
+//
+//  Para cada canción:
+//  - title:   nombre de la canción
+//  - artist:  artista
+//  - cover:   foto de portada (misma carpeta: "portada1.jpg"
+//             o URL: "https://i.imgur.com/XXX.jpg")
+//  - src:     archivo de audio (misma carpeta: "cancion1.mp3"
+//             o URL de audio directa)
+//  - color:   color del borde del vinilo (personaliza!)
+// ══════════════════════════════════════════════════
+const RECORDS = [
+  {
+    title:  "Reina Pepiada",
+    artist: "Álvaro Díaz",
+    cover:  "fotos_tocadisco/portada1.jpg",
+    src:    "audios_tocadisco/cancion1.mp3",
+    color:  "#e35f21"
+  },
+  {
+    title:  "Ojos de Girasol",
+    artist: "Darviin",
+    cover:  "fotos_tocadisco/portada2.jpg",
+    src:    "audios_tocadisco/cancion2.mp3",
+    color:  "#fbfcfe"
+  },
+  {
+    title:  "Perfect",
+    artist: "Li Naay",
+    cover:  "fotos_tocadisco/portada3.jpg",
+    src:    "audios_tocadisco/cancion3.mp3",
+    color:  "#da2d27"
+  },
+  {
+    title:  "Pa Tripea",
+    artist: "Li Naay",
+    cover:  "fotos_tocadisco/portada4.jpg",
+    src:    "audios_tocadisco/cancion4.mp3",
+    color:  "#222222"
+  },
+  {
+    title:  "Sabor a Mi",
+    artist: "Luis Miguel",
+    cover:  "fotos_tocadisco/portada5.jpg",
+    src:    "audios_tocadisco/cancion5.mp3",
+    color:  "#6d5079"
+  }
+];
+// ══════════════════════════════════════════════════
+
+// ── State ──
+let currentIndex  = -1;
+let isPlaying     = false;
+const audio       = document.getElementById('audioPlayer');
+const vinyl       = document.getElementById('vinyl');
+const tonearm     = document.getElementById('tonearm');
+const plinthLed   = document.getElementById('plinthLed');
+const playBtn     = document.getElementById('playBtn');
+const npEq        = document.getElementById('npEq');
+const shelf       = document.getElementById('shelf');
+
+// ── Build shelf ──
+RECORDS.forEach((rec, i) => {
+  const sl = document.createElement('div');
+  sl.className = 'record-sleeve';
+  sl.id = `sleeve-${i}`;
+  sl.innerHTML = `
+    <div class="sleeve-vinyl-peek"></div>
+    <div class="sleeve-cover">
+      <img src="${rec.cover}" alt="${rec.title}" loading="lazy" decoding="async">
+    </div>
+    <div class="sleeve-playing-badge">▶ Sonando</div>
+    <div class="sleeve-info">
+      <div class="sleeve-name">${rec.title}</div>
+      <div class="sleeve-artist">${rec.artist}</div>
+    </div>
+  `;
+  sl.addEventListener('click', () => loadRecord(i));
+  shelf.appendChild(sl);
+});
+
+// ── Load record onto turntable ──
+function loadRecord(index) {
+  const rec = RECORDS[index];
+
+  // Update active sleeve
+  document.querySelectorAll('.record-sleeve').forEach((s,i) => {
+    s.classList.toggle('active', i===index);
+  });
+
+  currentIndex = index;
+
+  // Update vinyl label
+  const lbImg = document.getElementById('vinylLabelImg');
+  lbImg.src = rec.cover;
+
+  // Change vinyl glow color
+  vinyl.style.filter = `drop-shadow(0 0 8px ${rec.color}55)`;
+
+  // Update now playing UI
+  document.getElementById('npIdle').style.display   = 'none';
+  document.getElementById('npCover').style.display  = 'flex';
+  document.getElementById('npText').style.display   = 'block';
+  document.getElementById('npCoverImg').src = rec.cover;
+  document.getElementById('npTitle').textContent   = rec.title;
+  document.getElementById('npArtist').textContent  = rec.artist;
+
+  // Load audio
+  audio.src = rec.src;
+  audio.load();
+
+  // Start playing
+  playRecord();
+}
+
+function playRecord() {
+  tonearm.classList.remove('at-rest');
+  tonearm.classList.add('playing');
+  vinyl.classList.add('spinning');
+  plinthLed.classList.add('on');
+  npEq.classList.add('active');
+  document.getElementById('iconPlay').style.display  = 'none';
+  document.getElementById('iconPause').style.display = 'block';
+  isPlaying = true;
+  audio.play().catch(()=>{});
+}
+
+function pauseRecord() {
+  tonearm.classList.add('at-rest');
+  tonearm.classList.remove('playing');
+  vinyl.classList.remove('spinning');
+  plinthLed.classList.remove('on');
+  npEq.classList.remove('active');
+  document.getElementById('iconPlay').style.display  = 'block';
+  document.getElementById('iconPause').style.display = 'none';
+  isPlaying = false;
+  audio.pause();
+}
+
+function togglePlay() {
+  if(currentIndex === -1){
+    // No record selected, load first one
+    loadRecord(0);
+    return;
+  }
+  if(isPlaying) pauseRecord();
+  else {
+    playRecord();
+    audio.play().catch(()=>{});
+  }
+}
+
+function nextTrack(){
+  const next = (currentIndex + 1) % RECORDS.length;
+  loadRecord(next);
+}
+function prevTrack(){
+  const prev = (currentIndex - 1 + RECORDS.length) % RECORDS.length;
+  loadRecord(prev);
+}
+
+// ── Progress bar ──
+function fmtTime(s){
+  if(!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+audio.addEventListener('timeupdate', ()=>{
+  if(!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration)*100;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('timeCurrent').textContent  = fmtTime(audio.currentTime);
+});
+audio.addEventListener('loadedmetadata', ()=>{
+  document.getElementById('timeTotal').textContent = fmtTime(audio.duration);
+});
+audio.addEventListener('ended', ()=>{
+  nextTrack();
+});
+
+function seekAudio(e){
+  if(!audio.duration) return;
+  const track = document.getElementById('progressTrack');
+  const rect  = track.getBoundingClientRect();
+  const pct   = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = pct * audio.duration;
+}
+
+// ── Floating hearts ──
+const bg = document.getElementById('heartsBg');
+['♥','❤','♪','♫','💕'].forEach(sym => {
+  for(let j=0;j<5;j++){
+    const h=document.createElement('div');
+    h.className='heart-float';
+    h.textContent=sym;
+    h.style.left=Math.random()*100+'vw';
+    h.style.fontSize=(0.8+Math.random()*1.2)+'rem';
+    h.style.animationDuration=(10+Math.random()*14)+'s';
+    h.style.animationDelay=(Math.random()*14)+'s';
+    bg.appendChild(h);
+  }
+});
+</script>
+</body>
+</html>
